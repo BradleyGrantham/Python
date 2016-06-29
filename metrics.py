@@ -143,13 +143,13 @@ def ranking_metric(homeTeam, awayTeam, ranking_dict):
 
     return ranking_metric
 
-def grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor, SoTAgainst):
-    goalsForNew = goalsFor[team][-38:]
-    goalsAgainstNew = goalsAgainst[team][-38:]
-    shotsForNew = shotsFor[team][-38:]
-    shotsAgainstNew = shotsAgainst[team][-38:]
-    SoTForNew = SoTFor[team][-38:]
-    SoTAgainstNew = SoTAgainst[team][-38:]
+def grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor, SoTAgainst, numberOfPreviousGames):
+    goalsForNew = goalsFor[team][-numberOfPreviousGames:]
+    goalsAgainstNew = goalsAgainst[team][-numberOfPreviousGames:]
+    shotsForNew = shotsFor[team][-numberOfPreviousGames:]
+    shotsAgainstNew = shotsAgainst[team][-numberOfPreviousGames:]
+    SoTForNew = SoTFor[team][-numberOfPreviousGames:]
+    SoTAgainstNew = SoTAgainst[team][-numberOfPreviousGames:]
     TSR = sum(shotsForNew)/(sum(shotsForNew)+sum(shotsAgainstNew))
     TSOTt = sum(SoTForNew)/sum(shotsForNew) + (sum(shotsAgainstNew)-sum(SoTAgainstNew))/sum(shotsAgainstNew)
     PDO = 1000*(sum(goalsForNew)/sum(SoTForNew) + (sum(SoTAgainstNew)-sum(goalsAgainstNew))/sum(SoTAgainstNew))
@@ -429,8 +429,8 @@ with open('alldata.csv') as csvfile:
             totalHomeGoalsNewSeason.append(float(score[0]))
             totalAwayGoalsNewSeason.append(float(score[1]))'''
             if len(goalsDict[homeTeam]) > 7 and len(goalsDict[awayTeam]) > 7:
-                home_rating = grayson_rating(homeTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict)
-                away_rating = grayson_rating(awayTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict)
+                home_rating = grayson_rating(homeTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict, 4)
+                away_rating = grayson_rating(awayTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict, 4)
                 '''x = -0.6283 + 0.004*grayson_rating(homeTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict)
                 y = -0.6283 + 0.004*grayson_rating(awayTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict)
                 x = x + 0.003*(rateform_dict[homeTeam]-rateform_dict[awayTeam])

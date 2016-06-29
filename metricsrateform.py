@@ -139,7 +139,7 @@ def predictor(probabilityMatrix):
 
 def ranking_metric(homeTeam, awayTeam, ranking_dict):
 
-	ranking_metric = (ranking_dict[homeTeam]-ranking_dict[awayTeam])/100
+	ranking_metric = (ranking_dict[homeTeam]-ranking_dict[awayTeam])
 
 	return ranking_metric
 
@@ -168,8 +168,8 @@ def grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor,
 
 
 teams = set()
-
 rateform_dict = {}
+
 
 with open('rsquared.csv', 'w') as csvfile:
 	csvfile.write('Rsquared')
@@ -183,11 +183,10 @@ with open('alldata.csv') as csvfile:
 	reader = csv.DictReader(csvfile)
 	for row in reader:
 		teams.add(row['HomeTeam'])
-
+		
 for team in teams:
 	rateform_dict[team] = 1000
-
-
+	
 '''with open('alldata.csv') as csvfile:
 	for team in teams:
 		goals = []
@@ -230,7 +229,6 @@ for team in teams:
 
 with open('alldata.csv') as csvfile:
 
-		ranking_dict_new = { 'Man City': 0, 'Liverpool': 0, 'Chelsea': 0, 'Arsenal': 0, 'Everton': 0, 'Tottenham': 0, 'Man United': 0, 'Southampton': 0, 'Stoke': 0, 'Newcastle': 0, 'Crystal Palace': 0, 'Swansea': 0, 'West Ham': 0, 'Sunderland': 0, 'Aston Villa': 0, 'Hull': 0, 'West Brom': 0, 'Leicester': 0, 'QPR': 0, 'Burnley': 0}
 		dates = []
 		totalHomeGoalsNewSeason = []
 		totalAwayGoalsNewSeason = []
@@ -249,6 +247,7 @@ with open('alldata.csv') as csvfile:
 		draws = 0
 
 		with open('rsquared.csv', 'a') as csvfile2:
+			#for z in range(1, 100):
 			z = 38
 			totalHomeGoals = []
 			totalAwayGoals = []
@@ -286,21 +285,21 @@ with open('alldata.csv') as csvfile:
 				awayTeam = row['AwayTeam']
 
 				if len(goalsDict[homeTeam]) > z and len(goalsDict[awayTeam]) > z:
-					home_rating = grayson_rating(homeTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict, z)
-					away_rating = grayson_rating(awayTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict, z)
-					home_rating_final = 0.5*(1.92 + 3.35*(home_rating - away_rating)) + 0.5*(1.32 + 0.000288*(rateform_dict[homeTeam] - rateform_dict[awayTeam]))
-					away_rating_final = 0.5*(1.92 + 3.35*(away_rating - home_rating)) + 0.5*(1.32 + 0.000288*(rateform_dict[awayTeam] - rateform_dict[homeTeam]))
-					expected.append(home_rating)
+					#home_rating = grayson_rating(homeTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict, z)
+					#away_rating = grayson_rating(awayTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict, z)
+					home_rating = rateform_dict[homeTeam] - rateform_dict[awayTeam]
+					away_rating = rateform_dict[awayTeam] - rateform_dict[homeTeam]
+					expected.append(home_rating - away_rating)
 					actual.append(float(row['FTHG']))
 					expected.append(away_rating - home_rating)
 					actual.append(float(row['FTAG']))
-					csvfile2.write(str(home_rating_final))
+					csvfile2.write(str(home_rating))
 					csvfile2.write(',')
-					csvfile2.write(str(row['FTHG']))
+					csvfile2.write(row['FTHG'])
 					csvfile2.write('\n')
-					csvfile2.write(str(away_rating_final))
+					csvfile2.write(str(away_rating))
 					csvfile2.write(',')
-					csvfile2.write(str(row['FTAG']))
+					csvfile2.write(row['FTAG'])
 					csvfile2.write('\n')
 
 				if row['FTHG'] > row['FTAG']:
@@ -313,7 +312,7 @@ with open('alldata.csv') as csvfile:
 					rateform_dict[awayTeam] = rateform_dict[awayTeam] - 0.05*rateform_dict[awayTeam] + (0.06*rateform_dict[homeTeam] + 0.05*rateform_dict[awayTeam])/2
 					rateform_dict[homeTeam] = rateform_dict[homeTeam] - 0.06*rateform_dict[homeTeam] + (0.06*rateform_dict[homeTeam] + 0.05*rateform_dict[awayTeam])/2
 				# print(x, probableHomeGoals)
-				# print(y, probableAwayGoals)'''
+				# print(y, probableAwayGoals)
 				shotsOnTargetDict[homeTeam].append(float(row['HST']))
 				shotsOnTargetFacedDict[homeTeam].append(float(row['AST']))
 				goalsDict[homeTeam].append((float(row['FTHG'])))
@@ -328,8 +327,12 @@ with open('alldata.csv') as csvfile:
 				shotsDict[awayTeam].append((float(row['AS'])))
 				shotsFacedDict[awayTeam].append((float(row['HS'])))
 				
-			
+				'''from scipy import stats
+				slope, intercept, r_value, p_value, std_err = stats.linregress(expected, actual)
+				r_squared = r_value**2'''
 
+
+print(rateform_dict)
 
 
 
