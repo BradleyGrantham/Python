@@ -162,9 +162,8 @@ def grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor,
 	TSoTR = sum(SoTForNew)/(sum(SoTForNew)+sum(SoTAgainstNew))
 	#TSOTt = sum(SoTForNew)/sum(shotsForNew) + (sum(shotsAgainstNew)-sum(SoTAgainstNew))/sum(shotsAgainstNew)
 	#PDO = 1000*(sum(goalsForNew)/sum(SoTForNew) + (sum(SoTAgainstNew)-sum(goalsAgainstNew))/sum(SoTAgainstNew))
-	rating = TSR
 	#rating = (0.5 + ((TSR-0.5)*math.pow(0.732,0.5)))*(1 + ((TSOTt-1)*math.pow(0.166,0.5)))*(1000 + ((PDO - 1000)*math.pow(0.176,0.5)))
-	return rating
+	return TSoTR
 
 
 teams = set()
@@ -249,7 +248,7 @@ with open('alldata.csv') as csvfile:
 		draws = 0
 
 		with open('rsquared.csv', 'a') as csvfile2:
-			z = 38
+			z = 28
 			totalHomeGoals = []
 			totalAwayGoals = []
 			store_x = []
@@ -258,12 +257,18 @@ with open('alldata.csv') as csvfile:
 			TsoTt = defaultdict(list)
 			TsoTtaverage = defaultdict(list)
 			totalTeamPoints = defaultdict(list)
-			shotsOnTargetDict = defaultdict(list)
-			shotsOnTargetFacedDict = defaultdict(list)
-			goalsDict = defaultdict(list)
-			goalsConcDict = defaultdict(list)
-			shotsDict = defaultdict(list)
-			shotsFacedDict = defaultdict(list)
+			homeShotsOnTargetDict = defaultdict(list)
+			homeShotsOnTargetFacedDict = defaultdict(list)
+			homeGoalsDict = defaultdict(list)
+			homeGoalsConcDict = defaultdict(list)
+			homeShotsDict = defaultdict(list)
+			homeShotsFacedDict = defaultdict(list)
+			awayShotsOnTargetDict = defaultdict(list)
+			awayShotsOnTargetFacedDict = defaultdict(list)
+			awayGoalsDict = defaultdict(list)
+			awayGoalsConcDict = defaultdict(list)
+			awayShotsDict = defaultdict(list)
+			awayShotsFacedDict = defaultdict(list)
 			averageTeamPoints = defaultdict(list)
 			expected = []
 			actual = []
@@ -285,20 +290,18 @@ with open('alldata.csv') as csvfile:
 				homeTeam = row['HomeTeam']
 				awayTeam = row['AwayTeam']
 
-				if len(goalsDict[homeTeam]) > z and len(goalsDict[awayTeam]) > z:
-					home_rating = grayson_rating(homeTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict, z)
-					away_rating = grayson_rating(awayTeam, goalsDict, goalsConcDict, shotsDict, shotsFacedDict, shotsOnTargetDict, shotsOnTargetFacedDict, z)
-					home_rating_final = 0.5*(1.92 + 3.35*(home_rating - away_rating)) + 0.5*(1.32 + 0.000288*(rateform_dict[homeTeam] - rateform_dict[awayTeam]))
-					away_rating_final = 0.5*(1.92 + 3.35*(away_rating - home_rating)) + 0.5*(1.32 + 0.000288*(rateform_dict[awayTeam] - rateform_dict[homeTeam]))
+				if len(homeGoalsDict[homeTeam]) > z and len(awayGoalsDict[awayTeam]) > z:
+					home_rating = grayson_rating(homeTeam, homeGoalsDict, homeGoalsConcDict, homeShotsDict, homeShotsFacedDict, homeShotsOnTargetDict, homeShotsOnTargetFacedDict, z)
+					away_rating = grayson_rating(awayTeam, awayGoalsDict, awayGoalsConcDict, awayShotsDict, awayShotsFacedDict, awayShotsOnTargetDict, awayShotsOnTargetFacedDict, z)
 					expected.append(home_rating)
 					actual.append(float(row['FTHG']))
 					expected.append(away_rating - home_rating)
 					actual.append(float(row['FTAG']))
-					csvfile2.write(str(home_rating_final))
+					csvfile2.write(str(home_rating))
 					csvfile2.write(',')
 					csvfile2.write(str(row['FTHG']))
 					csvfile2.write('\n')
-					csvfile2.write(str(away_rating_final))
+					csvfile2.write(str(away_rating))
 					csvfile2.write(',')
 					csvfile2.write(str(row['FTAG']))
 					csvfile2.write('\n')
@@ -314,19 +317,19 @@ with open('alldata.csv') as csvfile:
 					rateform_dict[homeTeam] = rateform_dict[homeTeam] - 0.06*rateform_dict[homeTeam] + (0.06*rateform_dict[homeTeam] + 0.05*rateform_dict[awayTeam])/2
 				# print(x, probableHomeGoals)
 				# print(y, probableAwayGoals)'''
-				shotsOnTargetDict[homeTeam].append(float(row['HST']))
-				shotsOnTargetFacedDict[homeTeam].append(float(row['AST']))
-				goalsDict[homeTeam].append((float(row['FTHG'])))
-				goalsConcDict[homeTeam].append((float(row['FTAG'])))
-				shotsDict[homeTeam].append((float(row['HS'])))
-				shotsFacedDict[homeTeam].append((float(row['AS'])))
+				homeShotsOnTargetDict[homeTeam].append(float(row['HST']))
+				homeShotsOnTargetFacedDict[homeTeam].append(float(row['AST']))
+				homeGoalsDict[homeTeam].append((float(row['FTHG'])))
+				homeGoalsConcDict[homeTeam].append((float(row['FTAG'])))
+				homeShotsDict[homeTeam].append((float(row['HS'])))
+				homeShotsFacedDict[homeTeam].append((float(row['AS'])))
 
-				shotsOnTargetDict[awayTeam].append(float(row['AST']))
-				shotsOnTargetFacedDict[awayTeam].append(float(row['HST']))
-				goalsDict[awayTeam].append((float(row['FTAG'])))
-				goalsConcDict[awayTeam].append((float(row['FTHG'])))
-				shotsDict[awayTeam].append((float(row['AS'])))
-				shotsFacedDict[awayTeam].append((float(row['HS'])))
+				awayShotsOnTargetDict[awayTeam].append(float(row['AST']))
+				awayShotsOnTargetFacedDict[awayTeam].append(float(row['HST']))
+				awayGoalsDict[awayTeam].append((float(row['FTAG'])))
+				awayGoalsConcDict[awayTeam].append((float(row['FTHG'])))
+				awayShotsDict[awayTeam].append((float(row['AS'])))
+				awayShotsFacedDict[awayTeam].append((float(row['HS'])))
 				
 			
 
