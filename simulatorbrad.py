@@ -57,7 +57,7 @@ def pois(x, mean):
 
 
 def bivpois(x, y, lambda1, lambda2, lambda3):
-    extraProbabilityDraws = pois(0, x) * pois(0, y)
+    extraProbabilityDraws = 0 #pois(0, x) * pois(0, y)
     if x == 0 or y == 0:
         probabilityMatrix = [[0 for i in range(x + 1)] for j in range(y + 1)]
         probabilityMatrix[x][y] = math.exp(- lambda3) * pois(x, lambda1) * pois(y, lambda2)
@@ -71,7 +71,7 @@ def bivpois(x, y, lambda1, lambda2, lambda3):
         for j in range(1, y + 1):
             for i in range(1, x + 1):
                 probabilityMatrix[i][j] = (lambda1 * probabilityMatrix[i - 1][j] + lambda3 * probabilityMatrix[i - 1][j - 1]) / (i)
-    probabilityMatrix[0][0] = probabilityMatrix[0][0] + pois(0, x) * pois(0, y)
+    #probabilityMatrix[0][0] = probabilityMatrix[0][0] + pois(0, x) * pois(0, y)
 
 
     #print(extraProbabilityDraws)
@@ -143,7 +143,9 @@ def ranking_metric(homeTeam, awayTeam, ranking):
 
     return ppm
 
-def grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor, SoTAgainst, numberOfGames):
+def attack_grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor, SoTAgainst, numberOfGames):
+    GR = []
+    TSR = []
     SoT_per_shot = []
     goalsForNew = goalsFor[team][-numberOfGames:]
     goalsAgainstNew = goalsAgainst[team][-numberOfGames:]
@@ -151,7 +153,7 @@ def grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor,
     shotsAgainstNew = shotsAgainst[team][-numberOfGames:]
     SoTForNew = SoTFor[team][-numberOfGames:]
     SoTAgainstNew = SoTAgainst[team][-numberOfGames:]
-    for i in range(numberOfGames-1):
+    for i in range(numberOfGames):
         if shotsForNew[i] == 0:
             SoT_per_shot.append(0)
         else:
@@ -164,12 +166,54 @@ def grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor,
         goalConceded = 0
     else:
         goalConceded = sum(goalsAgainstNew)/sum(SoTAgainstNew)
-    TSR = sum(shotsForNew)/(sum(shotsForNew)+sum(shotsAgainstNew))
+    for i in range(numberOfGames):
+        TSR.append(shotsForNew[i]/(shotsForNew[i]+shotsAgainstNew[i]))
+    for i in range(numberOfGames):
+        if goalsForNew[i]+goalsAgainstNew[i] == 0:
+            GR.append(0)
+        else:
+            GR.append(goalsForNew[i]/(goalsForNew[i]+goalsAgainstNew[i]))
     TSoTR = sum(SoTForNew)/(sum(SoTForNew)+sum(SoTAgainstNew))
     #TSOTt = sum(SoTForNew)/sum(shotsForNew) + (sum(shotsAgainstNew)-sum(SoTAgainstNew))/sum(shotsAgainstNew)
     #PDO = 1000*(sum(goalsForNew)/sum(SoTForNew) + (sum(SoTAgainstNew)-sum(goalsAgainstNew))/sum(SoTAgainstNew))
     #rating = (0.5 + ((TSR-0.5)*math.pow(0.732,0.5)))*(1 + ((TSOTt-1)*math.pow(0.166,0.5)))*(1000 + ((PDO - 1000)*math.pow(0.176,0.5)))
-    return average(goalsForNew), average(shotsForNew), average(SoTForNew), average(SoT_per_shot)
+    return average(TSR), average(SoT_per_shot), sum(goalsForNew)/sum(SoTForNew), average(GR)
+
+def defence_grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor, SoTAgainst, numberOfGames):
+    GR_against = []
+    TSR_against = []
+    SoT_per_shot = []
+    goalsForNew = goalsFor[team][-numberOfGames:]
+    goalsAgainstNew = goalsAgainst[team][-numberOfGames:]
+    shotsForNew = shotsFor[team][-numberOfGames:]
+    shotsAgainstNew = shotsAgainst[team][-numberOfGames:]
+    SoTForNew = SoTFor[team][-numberOfGames:]
+    SoTAgainstNew = SoTAgainst[team][-numberOfGames:]
+    for i in range(numberOfGames):
+        if shotsAgainstNew[i] == 0:
+            SoT_per_shot.append(0)
+        else:
+            SoT_per_shot.append(SoTAgainstNew[i]/shotsAgainstNew[i])
+    if sum(SoTForNew) == 0:
+        goalConversion = 0
+    else:
+        goalConversion = sum(goalsForNew)/(sum(SoTForNew))
+    if sum(SoTAgainstNew) == 0:
+        goalConceded = 0
+    else:
+        goalConceded = sum(goalsAgainstNew)/sum(SoTAgainstNew)
+    for i in range(numberOfGames):
+        TSR_against.append(shotsAgainstNew[i]/(shotsForNew[i]+shotsAgainstNew[i]))
+    for i in range(numberOfGames):
+        if goalsForNew[i]+goalsAgainstNew[i] == 0:
+            GR_against.append(0)
+        else:
+            GR_against.append(goalsAgainstNew[i]/(goalsForNew[i]+goalsAgainstNew[i]))
+    TSoTR = sum(SoTForNew)/(sum(SoTForNew)+sum(SoTAgainstNew))
+    #TSOTt = sum(SoTForNew)/sum(shotsForNew) + (sum(shotsAgainstNew)-sum(SoTAgainstNew))/sum(shotsAgainstNew)
+    #PDO = 1000*(sum(goalsForNew)/sum(SoTForNew) + (sum(SoTAgainstNew)-sum(goalsAgainstNew))/sum(SoTAgainstNew))
+    #rating = (0.5 + ((TSR-0.5)*math.pow(0.732,0.5)))*(1 + ((TSOTt-1)*math.pow(0.166,0.5)))*(1000 + ((PDO - 1000)*math.pow(0.176,0.5)))
+    return average(TSR_against), sum(goalsAgainstNew)/sum(SoTAgainstNew), average(goalsAgainstNew), average(GR_against)
 
 '''#download new data
 def downloadData():
@@ -368,20 +412,35 @@ awayGoalsConcDict['Burnley'] = awayGoalsConcDict['Hull']
 awayShotsDict['Burnley'] = awayShotsDict['Hull']
 awayShotsFacedDict['Burnley'] = awayShotsFacedDict['Hull']
 
+
 with open('E0.csv') as csvfile:
-    for boom in range(0, 100):
+    for boom in range(0, 1):
 
         rateform_dict = { 'Man City': 1600, 'Liverpool': 1562.7907, 'Chelsea': 1525.5814, 'Arsenal': 1469.76744, 'Everton': 1339.53488, 'Tottenham': 1283.72093, 'Man United': 1190.69767, 'Southampton': 1041.86047, 'Stoke': 930.232558, 'Newcastle': 911.627907, 'Crystal Palace': 837.209302, 'Swansea': 781.395349, 'West Ham': 744.186047, 'Sunderland': 706.976744, 'Aston Villa': 706.976744, 'Hull': 688.372093, 'West Brom': 669.767442, 'Leicester': 669.767442, 'QPR': 669.767442, 'Burnley': 669.767442}
         ranking_dict_new = { 'Man City': 0, 'Liverpool': 0, 'Chelsea': 0, 'Arsenal': 0, 'Everton': 0, 'Tottenham': 0, 'Man United': 0, 'Southampton': 0, 'Stoke': 0, 'Newcastle': 0, 'Crystal Palace': 0, 'Swansea': 0, 'West Ham': 0, 'Sunderland': 0, 'Aston Villa': 0, 'Hull': 0, 'West Brom': 0, 'Leicester': 0, 'QPR': 0, 'Burnley': 0}
         dates = []
         totalHomeGoalsNewSeason = []
         totalAwayGoalsNewSeason = []
-        teamPoints = defaultdict(list)
-        homeShotsOnTargetDictNewSeason = defaultdict(list)
-        awayShotsOnTargetDictNewSeason = defaultdict(list)
-        homeShotsOnTargetFacedDictNewSeason = defaultdict(list)
-        awayShotsOnTargetFacedDictNewSeason = defaultdict(list)
         goalsDictNewSeason = defaultdict(list)
+        
+
+        for team in teams:
+            if len(homeGoalsDict[team]) > 19:
+                for i in range(37, 18, -1):
+                    del homeShotsOnTargetDict[team][i]
+                    del homeShotsOnTargetFacedDict[team][i]
+                    del homeGoalsDict[team][i]
+                    del homeGoalsConcDict[team][i]
+                    del homeShotsDict[team][i]
+                    del homeShotsFacedDict[team][i]
+                    del awayShotsOnTargetDict[team][i]
+                    del awayShotsOnTargetFacedDict[team][i]
+                    del awayGoalsDict[team][i]
+                    del awayGoalsConcDict[team][i]
+                    del awayShotsDict[team][i]
+                    del awayShotsFacedDict[team][i]
+
+        teamPoints = defaultdict(list)
         combinedParameters = defaultdict(list)
         flags = 0
         flag = 0
@@ -399,10 +458,12 @@ with open('E0.csv') as csvfile:
             if datetime.datetime.strptime(row['Date'], "%d/%m/%y") > datetime.datetime(2014, 6,1) and datetime.datetime.strptime(row['Date'], "%d/%m/%y") < datetime.datetime(2015, 6, 1):
                 homeTeam = row['HomeTeam']
                 awayTeam = row['AwayTeam']
-                home_rating1, home_rating2, home_rating3, home_rating4 = grayson_rating(homeTeam, homeGoalsDict, homeGoalsConcDict, homeShotsDict, homeShotsFacedDict, homeShotsOnTargetDict, homeShotsOnTargetFacedDict, 18)
-                away_rating1, away_rating2, away_rating3, away_rating4 = grayson_rating(awayTeam, awayGoalsDict, awayGoalsConcDict, awayShotsDict, awayShotsFacedDict, awayShotsOnTargetDict, awayShotsOnTargetFacedDict, 18)
-                x = -0.2998*home_rating1 + 0.0537*home_rating2 + 0.0427*home_rating3 + 0.4492*home_rating4 + 0.0181
-                y = -0.2998*away_rating1 + 0.0537*away_rating2 + 0.0427*away_rating3 + 0.4492*away_rating4 + 0.0181
+                home_attack_rating1, home_attack_rating2, home_attack_rating3, home_attack_rating4 = attack_grayson_rating(homeTeam, homeGoalsDict, homeGoalsConcDict, homeShotsDict, homeShotsFacedDict, homeShotsOnTargetDict, homeShotsOnTargetFacedDict, len(homeGoalsDict[homeTeam]))
+                home_defence_rating1, home_defence_rating2, home_defence_rating3, home_defence_rating4 = defence_grayson_rating(homeTeam, homeGoalsDict, homeGoalsConcDict, homeShotsDict, homeShotsFacedDict, homeShotsOnTargetDict, homeShotsOnTargetFacedDict, len(homeGoalsDict[homeTeam]))
+                away_attack_rating1, away_attack_rating2, away_attack_rating3, away_attack_rating4 = attack_grayson_rating(awayTeam, awayGoalsDict, awayGoalsConcDict, awayShotsDict, awayShotsFacedDict, awayShotsOnTargetDict, awayShotsOnTargetFacedDict, len(awayGoalsDict[awayTeam]))
+                away_defence_rating1, away_defence_rating2, away_defence_rating3, away_defence_rating4 = defence_grayson_rating(awayTeam, awayGoalsDict, awayGoalsConcDict, awayShotsDict, awayShotsFacedDict, awayShotsOnTargetDict, awayShotsOnTargetFacedDict, len(awayGoalsDict[awayTeam]))
+                x = 0.4182*home_attack_rating1 + 0.9073*home_attack_rating2 + 0.3586*home_attack_rating3 - 0.5467*home_attack_rating4 + 0.5019*away_defence_rating1 + 0.9585*away_defence_rating2 + 1.0234*away_defence_rating3 + 1.4081*away_defence_rating4 - 1.3281
+                y = 0.4182*away_attack_rating1 + 0.9073*away_attack_rating2 + 0.3586*away_attack_rating3 - 0.5467*away_attack_rating4 + 0.5019*home_defence_rating1 + 0.9585*home_defence_rating2 + 1.0234*home_defence_rating3 + 1.4081*home_defence_rating4 - 1.3281
                 #print(x,y)
                 probabilityMatrix = bivpois(6, 6, x, y, 0.01)
                 for i in range(0, 5):
@@ -435,10 +496,7 @@ with open('E0.csv') as csvfile:
                     rateform_dict[awayTeam] = rateform_dict[awayTeam] - 0.05*rateform_dict[awayTeam] + (0.07*rateform_dict[homeTeam] + 0.05*rateform_dict[awayTeam])/2
                     rateform_dict[homeTeam] = rateform_dict[homeTeam] - 0.07*rateform_dict[homeTeam] + (0.07*rateform_dict[homeTeam] + 0.05*rateform_dict[awayTeam])/2
 
-                homeShotsOnTargetDictNewSeason[homeTeam].append(float(row['HST']))
-                awayShotsOnTargetDictNewSeason[awayTeam].append(float(row['AST']))
-                homeShotsOnTargetFacedDictNewSeason[homeTeam].append(float(row['AST']))
-                awayShotsOnTargetFacedDictNewSeason[awayTeam].append(float(row['HST']))
+
                 goalsDictNewSeason[homeTeam].append(float(score[0]))
                 goalsDictNewSeason[awayTeam].append(float(score[1]))
                 # print(x, probableHomeGoals)
@@ -462,6 +520,7 @@ with open('E0.csv') as csvfile:
             totalTeamPoints[team].append(sum(teamPoints[team]))
             totalGoalsDictNewSeason[team].append(sum(goalsDictNewSeason[team]))
         print(boom)
+        print(len(homeGoalsConcDict['Chelsea']))
         #print(flag)
 
 for team in totalTeamPoints:
