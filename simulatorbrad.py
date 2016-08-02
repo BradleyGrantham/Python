@@ -414,7 +414,7 @@ awayShotsFacedDict['Burnley'] = awayShotsFacedDict['Hull']
 
 
 with open('E0.csv') as csvfile:
-    for boom in range(0, 1):
+    for boom in range(0, 100):
 
         rateform_dict = { 'Man City': 1600, 'Liverpool': 1562.7907, 'Chelsea': 1525.5814, 'Arsenal': 1469.76744, 'Everton': 1339.53488, 'Tottenham': 1283.72093, 'Man United': 1190.69767, 'Southampton': 1041.86047, 'Stoke': 930.232558, 'Newcastle': 911.627907, 'Crystal Palace': 837.209302, 'Swansea': 781.395349, 'West Ham': 744.186047, 'Sunderland': 706.976744, 'Aston Villa': 706.976744, 'Hull': 688.372093, 'West Brom': 669.767442, 'Leicester': 669.767442, 'QPR': 669.767442, 'Burnley': 669.767442}
         ranking_dict_new = { 'Man City': 0, 'Liverpool': 0, 'Chelsea': 0, 'Arsenal': 0, 'Everton': 0, 'Tottenham': 0, 'Man United': 0, 'Southampton': 0, 'Stoke': 0, 'Newcastle': 0, 'Crystal Palace': 0, 'Swansea': 0, 'West Ham': 0, 'Sunderland': 0, 'Aston Villa': 0, 'Hull': 0, 'West Brom': 0, 'Leicester': 0, 'QPR': 0, 'Burnley': 0}
