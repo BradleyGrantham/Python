@@ -12,7 +12,7 @@ from collections import defaultdict
 import random
 
 
-def asianHandicap(probabilityMatrix):
+def asianHandicap(probability_matrix):
 	asianHandicap = {}
 	homeProb = 0
 	drawProb = 0
@@ -23,21 +23,21 @@ def asianHandicap(probabilityMatrix):
 	awayProbExactlyTwo = 0
 	for i in range(0, 5):
 		for j in range(0, 5):
-			# print(str(probabilityMatrix[i][j]) + ', ', end=" ")
+			# print(str(probability_matrix[i][j]) + ', ', end=" ")
 			if i > j:
-				homeProb += probabilityMatrix[i][j]
+				homeProb += probability_matrix[i][j]
 			if i < j:
-				awayProb += probabilityMatrix[i][j]
+				awayProb += probability_matrix[i][j]
 			if i == j:
-				drawProb += probabilityMatrix[i][j]
+				drawProb += probability_matrix[i][j]
 			if i - j == 1:
-				homeProbExactlyOne += probabilityMatrix[i][j]
+				homeProbExactlyOne += probability_matrix[i][j]
 			if i - j == 2:
-				homeProbExactlyTwo += probabilityMatrix[i][j]
+				homeProbExactlyTwo += probability_matrix[i][j]
 			if j - i == 1:
-				awayProbExactlyOne += probabilityMatrix[i][j]
+				awayProbExactlyOne += probability_matrix[i][j]
 			if j - i == 2:
-				awayProbExactlyTwo += probabilityMatrix[i][j]
+				awayProbExactlyTwo += probability_matrix[i][j]
 			# print("\n")
 	if homeProb > awayProb:
 		asianHandicap['0'] = [round((1 - drawProb) / homeProb, 2),
@@ -46,38 +46,34 @@ def asianHandicap(probabilityMatrix):
 	for handicap, odds in asianHandicap.items():
 		print(handicap, odds)
 
-
 def average(someList):
 	answer = sum(someList) / len(someList)
 	return answer
-
 
 def pois(x, mean):
 	result = ((mean ** x) * math.exp(- mean)) / math.factorial(x)
 	return result
 
-
 def bivpois(x, y, lambda1, lambda2, lambda3):
 	extraProbabilityDraws = pois(0, x) * pois(0, y)
 	if x == 0 or y == 0:
-		probabilityMatrix = [[0 for i in range(x + 1)] for j in range(y + 1)]
-		probabilityMatrix[x][y] = math.exp(- lambda3) * pois(x, lambda1) * pois(y, lambda2)
+		probability_matrix = [[0 for i in range(x + 1)] for j in range(y + 1)]
+		probability_matrix[x][y] = math.exp(- lambda3) * pois(x, lambda1) * pois(y, lambda2)
 	else:
-		probabilityMatrix = [[0 for i in range(x + 1)] for j in range(y + 1)]
-		probabilityMatrix[0][0] = (1 - extraProbabilityDraws) * math.exp(-lambda1 - lambda2 - lambda3)
+		probability_matrix = [[0 for i in range(x + 1)] for j in range(y + 1)]
+		probability_matrix[0][0] = (1 - extraProbabilityDraws) * math.exp(-lambda1 - lambda2 - lambda3)
 		for i in range(1, x + 1):
-			probabilityMatrix[i][0] = (probabilityMatrix[i - 1][0] * lambda1) / (i)
+			probability_matrix[i][0] = (probability_matrix[i - 1][0] * lambda1) / (i)
 		for j in range(1, y + 1):
-			probabilityMatrix[0][j] = (probabilityMatrix[0][j - 1] * lambda2) / (j)
+			probability_matrix[0][j] = (probability_matrix[0][j - 1] * lambda2) / (j)
 		for j in range(1, y + 1):
 			for i in range(1, x + 1):
-				probabilityMatrix[i][j] = (lambda1 * probabilityMatrix[i - 1][j] + lambda3 * probabilityMatrix[i - 1][j - 1]) / (i)
-	probabilityMatrix[0][0] = probabilityMatrix[0][0] + pois(0, x) * pois(0, y)
+				probability_matrix[i][j] = (lambda1 * probability_matrix[i - 1][j] + lambda3 * probability_matrix[i - 1][j - 1]) / (i)
+	probability_matrix[0][0] = probability_matrix[0][0] + pois(0, x) * pois(0, y)
 
 
 	#print(extraProbabilityDraws)
-	return probabilityMatrix
-
+	return probability_matrix
 
 def covariance(homeGoals, awayGoals):
 	averageHomeGoals = sum(homeGoals) / len(homeGoals)
@@ -88,35 +84,7 @@ def covariance(homeGoals, awayGoals):
 	covariance = covariance / (len(homeGoals) - 1)
 	return covariance
 
-
-def nilNilProb(homeTeam, awayTeam):
-	with open('E0.csv') as csvfile:
-		count = 0
-		nilNil = 0
-		reader = csv.DictReader(csvfile)
-		for row in reader:
-			for team in top6:
-				if row['HomeTeam'] == homeTeam and row['AwayTeam'] == team:
-					count += 1
-					if row['FTHG'] == '0' and row['FTAG'] == '0':
-						nilNil += 1
-				if row['HomeTeam'] == team and row['AwayTeam'] == homeTeam:
-					count += 1
-					if row['FTHG'] == '0' and row['FTAG'] == '0':
-						nilNil += 1
-				if row['HomeTeam'] == awayTeam and row['AwayTeam'] == team:
-					count += 1
-					if row['FTHG'] == '0' and row['FTAG'] == '0':
-						nilNil += 1
-				if row['HomeTeam'] == team and row['AwayTeam'] == awayTeam:
-					count += 1
-					if row['FTHG'] == '0' and row['FTAG'] == '0':
-						nilNil += 1
-
-	return nilNil / count
-
-
-def predictor(probabilityMatrix):
+def predictor(probability_matrix):
 	x = random.random()
 	running_total = 0
 	home_goals = 10
@@ -124,8 +92,8 @@ def predictor(probabilityMatrix):
 	score = []
 	for i in range(0, 5):
 		for j in range(0, 5):
-			# print(str(probabilityMatrix[i][j]) + ', ', end =" ")
-			running_total += probabilityMatrix[i][j]
+			# print(str(probability_matrix[i][j]) + ', ', end =" ")
+			running_total += probability_matrix[i][j]
 			if running_total > x:
 				home_goals = i
 				away_goals = j
@@ -138,13 +106,7 @@ def predictor(probabilityMatrix):
 	score = [home_goals, away_goals]
 	return score
 
-def ranking_metric(homeTeam, awayTeam, ranking):
-
-	ppm = (ranking[homeTeam]-ranking[awayTeam])/100
-
-	return ppm
-
-def attack_grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor, SoTAgainst, numberOfGames):
+def attack_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor, SoTAgainst, numberOfGames):
 	GR = []
 	TSR = []
 	SoT_per_shot = []
@@ -178,9 +140,9 @@ def attack_grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, 
 	#TSOTt = sum(SoTForNew)/sum(shotsForNew) + (sum(shotsAgainstNew)-sum(SoTAgainstNew))/sum(shotsAgainstNew)
 	#PDO = 1000*(sum(goalsForNew)/sum(SoTForNew) + (sum(SoTAgainstNew)-sum(goalsAgainstNew))/sum(SoTAgainstNew))
 	#rating = (0.5 + ((TSR-0.5)*math.pow(0.732,0.5)))*(1 + ((TSOTt-1)*math.pow(0.166,0.5)))*(1000 + ((PDO - 1000)*math.pow(0.176,0.5)))
-	return average(TSR), average(SoT_per_shot), sum(goalsForNew)/sum(SoTForNew), average(GR)
+	return [average(TSR), average(SoT_per_shot), sum(goalsForNew)/sum(SoTForNew), average(GR)]
 
-def defence_grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor, SoTAgainst, numberOfGames):
+def defence_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst, SoTFor, SoTAgainst, numberOfGames):
 	GR_against = []
 	TSR_against = []
 	SoT_per_shot = []
@@ -214,7 +176,29 @@ def defence_grayson_rating(team, goalsFor, goalsAgainst, shotsFor, shotsAgainst,
 	#TSOTt = sum(SoTForNew)/sum(shotsForNew) + (sum(shotsAgainstNew)-sum(SoTAgainstNew))/sum(shotsAgainstNew)
 	#PDO = 1000*(sum(goalsForNew)/sum(SoTForNew) + (sum(SoTAgainstNew)-sum(goalsAgainstNew))/sum(SoTAgainstNew))
 	#rating = (0.5 + ((TSR-0.5)*math.pow(0.732,0.5)))*(1 + ((TSOTt-1)*math.pow(0.166,0.5)))*(1000 + ((PDO - 1000)*math.pow(0.176,0.5)))
-	return average(TSR_against), sum(goalsAgainstNew)/sum(SoTAgainstNew), average(goalsAgainstNew), average(GR_against)
+	return [average(TSR_against), sum(goalsAgainstNew)/sum(SoTAgainstNew), average(goalsAgainstNew), average(GR_against)]
+
+def probability_calculator(probability_matrix):
+	total = 0
+	home_prob = 0
+	away_prob = 0
+	draw_prob = 0
+	for i in range(0, 5):
+		for j in range(0, 5):
+			#print(str(probability_matrix[i][j]) + ', ',end = " ")
+			total += probability_matrix[i][j]
+			if i > j:
+				home_prob += probability_matrix[i][j]
+			if i < j:
+				away_prob += probability_matrix[i][j]
+			if i == j:
+				draw_prob += probability_matrix[i][j]
+			#print("\n")
+	return home_prob, away_prob, draw_prob
+
+def regression(attack_ratings, defence_ratings):
+	mean = 0.4182*attack_ratings[0] + 0.9073*attack_ratings[1] + 0.3586*attack_ratings[2] - 0.5467*attack_ratings[3] + 0.5019*defence_ratings[0] + 0.9585*defence_ratings[1] + 1.0234*defence_ratings[2] + 1.4081*defence_ratings[3] - 0.8
+	return mean
 
 '''#download new data
 def downloadData():
@@ -224,7 +208,7 @@ def downloadData():
 	csvstr = str(downloadValues).strip("b'")
 	lines = csvstr.split("\\r\\n")
 	with open('download.csv', 'w') as f:
-		fieldnames = ['Div','Date','HomeTeam','AwayTeam','FTHG','FTAG','FTR','HTHG','HTAG','HTR','Referee','HS','AS','HST','AST','HF','AF','HC','AC','HY','AY','HR','AR','B365H','B365D','B365A','BWH','BWD','BWA','IWH','IWD','IWA','LBH','LBD','LBA','PSH','PSD','PSA','WHH','WHD','WHA','VCH','VCD','VCA','Bb1X2','BbMxH','BbAvH','BbMxD','BbAvD','BbMxA','BbAvA','BbOU','BbMx>2.5','BbAv>2.5','BbMx<2.5','BbAv<2.5','BbAH','BbAHh','BbMxAHH','BbAvAHH','BbMxAHA','BbAvAHA', 'HomePenalties', 'AwayPenalties']
+		fieldnames = ['Div','Date','home_team','away_team','FTHG','FTAG','FTR','HTHG','HTAG','HTR','Referee','HS','AS','HST','AST','HF','AF','HC','AC','HY','AY','HR','AR','B365H','B365D','B365A','BWH','BWD','BWA','IWH','IWD','IWA','LBH','LBD','LBA','PSH','PSD','PSA','WHH','WHD','WHA','VCH','VCD','VCA','Bb1X2','BbMxH','BbAvH','BbMxD','BbAvD','BbMxA','BbAvA','BbOU','BbMx>2.5','BbAv>2.5','BbMx<2.5','BbAv<2.5','BbAH','BbAHh','BbMxAHH','BbAvAHH','BbMxAHA','BbAvAHA', 'HomePenalties', 'AwayPenalties']
 		writer = csv.DictWriter(f, fieldnames=fieldnames)
 		writer.writeheader()
 		for line in lines[1:]:
@@ -233,7 +217,7 @@ downloadData()
 
 #update data
 with open('download.csv') as csvfile:
-	fieldnames = ['Div','Date','HomeTeam','AwayTeam','FTHG','FTAG','FTR','HTHG','HTAG','HTR','Referee','HS','AS','HST','AST','HF','AF','HC','AC','HY','AY','HR','AR','B365H','B365D','B365A','BWH','BWD','BWA','IWH','IWD','IWA','LBH','LBD','LBA','PSH','PSD','PSA','WHH','WHD','WHA','VCH','VCD','VCA','Bb1X2','BbMxH','BbAvH','BbMxD','BbAvD','BbMxA','BbAvA','BbOU','BbMx>2.5','BbAv>2.5','BbMx<2.5','BbAv<2.5','BbAH','BbAHh','BbMxAHH','BbAvAHH','BbMxAHA','BbAvAHA','HomePenalties', 'AwayPenalties']
+	fieldnames = ['Div','Date','home_team','away_team','FTHG','FTAG','FTR','HTHG','HTAG','HTR','Referee','HS','AS','HST','AST','HF','AF','HC','AC','HY','AY','HR','AR','B365H','B365D','B365A','BWH','BWD','BWA','IWH','IWD','IWA','LBH','LBD','LBA','PSH','PSD','PSA','WHH','WHD','WHA','VCH','VCD','VCA','Bb1X2','BbMxH','BbAvH','BbMxD','BbAvD','BbMxA','BbAvA','BbOU','BbMx>2.5','BbAv>2.5','BbMx<2.5','BbAv<2.5','BbAH','BbAHh','BbMxAHH','BbAvAHH','BbMxAHA','BbAvAHA','HomePenalties', 'AwayPenalties']
 	downloadReader = csv.DictReader(csvfile)
 	downloadWriter = csv.DictWriter(csvfile, fieldnames=fieldnames)
 	with open('E0.csv') as csvfile:
@@ -267,7 +251,7 @@ def updatePenalties():
 			row['AwayPenalties'] = '0'
 			new_rows.append(row)
 			for number in range(len(dict_date)):
-				if row['HomeTeam'] == dict_team[number] and row['Date'] == dict_date[number]:
+				if row['home_team'] == dict_team[number] and row['Date'] == dict_date[number]:
 					if row['HomePenalties'] == '3':
 						row['HomePenalties'] = '4'
 						new_rows.pop()
@@ -284,7 +268,7 @@ def updatePenalties():
 						row['HomePenalties'] = '1'
 						new_rows.pop()
 						new_rows.append(row)
-				if row['AwayTeam'] == dict_team[number] and row['Date'] == dict_date[number]:
+				if row['away_team'] == dict_team[number] and row['Date'] == dict_date[number]:
 					if row['AwayPenalties'] == '3':
 						row['AwayPenalties'] = '4'
 						new_rows.pop()
@@ -303,48 +287,36 @@ def updatePenalties():
 						new_rows.append(row)
 
 	with open('E0.csv', 'w') as f:
-		writer = csv.DictWriter(f, ['Div','Date','HomeTeam','AwayTeam','FTHG','FTAG','FTR','HTHG','HTAG','HTR','Referee','HS','AS','HST','AST','HF','AF','HC','AC','HY','AY','HR','AR','B365H','B365D','B365A','BWH','BWD','BWA','IWH','IWD','IWA','LBH','LBD','LBA','PSH','PSD','PSA','WHH','WHD','WHA','SJH','SJD','SJA','VCH','VCD','VCA','Bb1X2','BbMxH','BbAvH','BbMxD','BbAvD','BbMxA','BbAvA','BbOU','BbMx>2.5','BbAv>2.5','BbMx<2.5','BbAv<2.5','BbAH','BbAHh','BbMxAHH','HomePenalties','AwayPenalties','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''])
+		writer = csv.DictWriter(f, ['Div','Date','home_team','away_team','FTHG','FTAG','FTR','HTHG','HTAG','HTR','Referee','HS','AS','HST','AST','HF','AF','HC','AC','HY','AY','HR','AR','B365H','B365D','B365A','BWH','BWD','BWA','IWH','IWD','IWA','LBH','LBD','LBA','PSH','PSD','PSA','WHH','WHD','WHA','SJH','SJD','SJA','VCH','VCD','VCA','Bb1X2','BbMxH','BbAvH','BbMxD','BbAvD','BbMxA','BbAvA','BbOU','BbMx>2.5','BbAv>2.5','BbMx<2.5','BbAv<2.5','BbAH','BbAHh','BbMxAHH','HomePenalties','AwayPenalties','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''])
 		writer.writeheader()
 		for row in new_rows:
 			writer.writerow(row)
 updatePenalties()'''
 
 teams = set()
-totalHomeGoals = []
-totalAwayGoals = []
+total_home_goals = []
+total_away_goals = []
 store_x = []
 store_y = []
-totalTeamPoints = defaultdict(list)
-totalTeamPoints1 = defaultdict(list)
-homeGoals = []
-homeShots = []
-homeShotsFaced = []
-homeShotsOnTarget = []
-homeShotsOnTargetFaced = []
-awayGoals = []
-awayShots = []
-awayShotsFaced = []
-awayShotsOnTarget = []
-awayShotsOnTargetFaced = []
-homeGoalsConc = []
-awayGoalsConc = []
-homeShotsOnTargetDict = defaultdict(list)
-homeShotsOnTargetFacedDict = defaultdict(list)
-homeGoalsDict = defaultdict(list)
-homeGoalsConcDict = defaultdict(list)
-homeShotsDict = defaultdict(list)
-homeShotsFacedDict = defaultdict(list)
-awayShotsOnTargetDict = defaultdict(list)
-awayShotsOnTargetFacedDict = defaultdict(list)
-awayGoalsDict = defaultdict(list)
-awayGoalsConcDict = defaultdict(list)
-awayShotsDict = defaultdict(list)
-awayShotsFacedDict = defaultdict(list)
-averageTeamPoints = defaultdict(list)
-goalsDictNewSeasonAv = defaultdict(list)
-totalGoalsDictNewSeason = defaultdict(list)
+total_team_points = defaultdict(list)
+home_shots_on_target = defaultdict(list)
+home_shots_on_target_faced = defaultdict(list)
+home_goals_scored = defaultdict(list)
+home_goals_conceded = defaultdict(list)
+home_total_shots = defaultdict(list)
+home_total_shots_faced = defaultdict(list)
+away_shots_on_target = defaultdict(list)
+away_shots_on_target_faced = defaultdict(list)
+away_goals_scored = defaultdict(list)
+away_goals_conceded = defaultdict(list)
+away_total_shots = defaultdict(list)
+away_total_shots_faced = defaultdict(list)
+av_team_points = defaultdict(list)
+av_goals_scored = defaultdict(list)
+total_goals = defaultdict(list)
 
-
+wages = { 'Man City': 2.08, 'Liverpool': 1.63, 'Chelsea': 2.31, 'Arsenal': 2.06, 'Everton': 0.80, 'Tottenham': 1.18, 'Man United': 2.17, 'Southampton': 0.64, 'Stoke': 0.77, 'Hull': 0.3, 'Burnley': 0.3, 'Swansea': 0.55, 'West Ham': 0.74, 'West Brom': 0.73, 'Cardiff': 0.3, 'Crystal Palace': 0.58, 'Leicester': 0.60, 'Sunderland': 0.76, 'Newcastle': 0.60, 'Aston Villa': 0.60, 'Norwich': 0.30, 'Fulham': 0.50}
+promoted_teams = ['Middlesbrough', 'Hull', 'Burnley']
 
 with open('E0.csv') as csvfile:
 	reader = csv.DictReader(csvfile)
@@ -357,170 +329,94 @@ with open('E0.csv') as csvfile:
 		csvfile.seek(0)
 		for row in reader:
 			if datetime.datetime.strptime(row['Date'], "%d/%m/%y") > datetime.datetime(2015, 6, 1) and datetime.datetime.strptime(row['Date'], "%d/%m/%y") < datetime.datetime(2016, 6, 1):
-				totalHomeGoals.append((float(row['FTHG'])))
-				totalAwayGoals.append((float(row['FTAG'])))
+				total_home_goals.append((float(row['FTHG'])))
+				total_away_goals.append((float(row['FTAG'])))
 				if row['HomeTeam'] == team:
-					homeShotsOnTargetDict[team].append(float(row['HST']))
-					homeShotsOnTargetFacedDict[team].append(float(row['AST']))
-					homeGoalsDict[team].append((float(row['FTHG'])))
-					homeGoalsConcDict[team].append((float(row['FTAG'])))
-					homeShotsDict[team].append((float(row['HS'])))
-					homeShotsFacedDict[team].append((float(row['AS'])))
+					home_shots_on_target[team].append(float(row['HST']))
+					home_shots_on_target_faced[team].append(float(row['AST']))
+					home_goals_scored[team].append((float(row['FTHG'])))
+					home_goals_conceded[team].append((float(row['FTAG'])))
+					home_total_shots[team].append((float(row['HS'])))
+					home_total_shots_faced[team].append((float(row['AS'])))
 				if row['AwayTeam'] == team:
-					awayShotsOnTargetDict[team].append(float(row['AST']))
-					awayShotsOnTargetFacedDict[team].append(float(row['HST']))
-					awayGoalsDict[team].append((float(row['FTAG'])))
-					awayGoalsConcDict[team].append((float(row['FTHG'])))
-					awayShotsDict[team].append((float(row['AS'])))
-					awayShotsFacedDict[team].append((float(row['HS'])))
+					away_shots_on_target[team].append(float(row['AST']))
+					away_shots_on_target_faced[team].append(float(row['HST']))
+					away_goals_scored[team].append((float(row['FTAG'])))
+					away_goals_conceded[team].append((float(row['FTHG'])))
+					away_total_shots[team].append((float(row['AS'])))
+					away_total_shots_faced[team].append((float(row['HS'])))
+
+for promoted_team in promoted_teams:
+	home_shots_on_target[promoted_team] = home_shots_on_target['Aston Villa']
+	home_shots_on_target_faced[promoted_team] = home_shots_on_target_faced['Aston Villa']
+	home_goals_scored[promoted_team] = home_goals_scored['Aston Villa']
+	home_goals_conceded[promoted_team] = home_goals_conceded['Aston Villa']
+	home_total_shots[promoted_team] = home_total_shots['Aston Villa']
+	home_total_shots_faced[promoted_team] = home_total_shots_faced['Aston Villa']
+	away_shots_on_target[promoted_team] = away_shots_on_target['Aston Villa']
+	away_shots_on_target_faced[promoted_team] = away_shots_on_target_faced['Aston Villa']
+	away_goals_scored[promoted_team] = away_goals_scored['Aston Villa']
+	away_goals_conceded[promoted_team] = away_goals_conceded['Aston Villa']
+	away_total_shots[promoted_team] = away_total_shots['Aston Villa']
+	away_total_shots_faced[promoted_team] = away_total_shots_faced['Aston Villa']
 
 
-homeShotsOnTargetDict['Middlesbrough'] = homeShotsOnTargetDict['Aston Villa']
-homeShotsOnTargetFacedDict['Middlesbrough'] = homeShotsOnTargetFacedDict['Aston Villa']
-homeGoalsDict['Middlesbrough'] = homeGoalsDict['Aston Villa']
-homeGoalsConcDict['Middlesbrough'] = homeGoalsConcDict['Aston Villa']
-homeShotsDict['Middlesbrough'] = homeShotsDict['Aston Villa']
-homeShotsFacedDict['Middlesbrough'] = homeShotsFacedDict['Aston Villa']
-awayShotsOnTargetDict['Middlesbrough'] = awayShotsOnTargetDict['Aston Villa']
-awayShotsOnTargetFacedDict['Middlesbrough'] = awayShotsOnTargetFacedDict['Aston Villa']
-awayGoalsDict['Middlesbrough'] = awayGoalsDict['Aston Villa']
-awayGoalsConcDict['Middlesbrough'] = awayGoalsConcDict['Aston Villa']
-awayShotsDict['Middlesbrough'] = awayShotsDict['Aston Villa']
-awayShotsFacedDict['Middlesbrough'] = awayShotsFacedDict['Aston Villa']
-
-homeShotsOnTargetDict['Hull'] = homeShotsOnTargetDict['Aston Villa']
-homeShotsOnTargetFacedDict['Hull'] = homeShotsOnTargetFacedDict['Aston Villa']
-homeGoalsDict['Hull'] = homeGoalsDict['Aston Villa']
-homeGoalsConcDict['Hull'] = homeGoalsConcDict['Aston Villa']
-homeShotsDict['Hull'] = homeShotsDict['Aston Villa']
-homeShotsFacedDict['Hull'] = homeShotsFacedDict['Aston Villa']
-awayShotsOnTargetDict['Hull'] = awayShotsOnTargetDict['Aston Villa']
-awayShotsOnTargetFacedDict['Hull'] = awayShotsOnTargetFacedDict['Aston Villa']
-awayGoalsDict['Hull'] = awayGoalsDict['Aston Villa']
-awayGoalsConcDict['Hull'] = awayGoalsConcDict['Aston Villa']
-awayShotsDict['Hull'] = awayShotsDict['Aston Villa']
-awayShotsFacedDict['Hull'] = awayShotsFacedDict['Aston Villa']
-
-homeShotsOnTargetDict['Burnley'] = homeShotsOnTargetDict['Aston Villa']
-homeShotsOnTargetFacedDict['Burnley'] = homeShotsOnTargetFacedDict['Aston Villa']
-homeGoalsDict['Burnley'] = homeGoalsDict['Aston Villa']
-homeGoalsConcDict['Burnley'] = homeGoalsConcDict['Aston Villa']
-homeShotsDict['Burnley'] = homeShotsDict['Aston Villa']
-homeShotsFacedDict['Burnley'] = homeShotsFacedDict['Aston Villa']
-awayShotsOnTargetDict['Burnley'] = awayShotsOnTargetDict['Aston Villa']
-awayShotsOnTargetFacedDict['Burnley'] = awayShotsOnTargetFacedDict['Aston Villa']
-awayGoalsDict['Burnley'] = awayGoalsDict['Aston Villa']
-awayGoalsConcDict['Burnley'] = awayGoalsConcDict['Aston Villa']
-awayShotsDict['Burnley'] = awayShotsDict['Aston Villa']
-awayShotsFacedDict['Burnley'] = awayShotsFacedDict['Aston Villa']
-
-chances = 0
 with open('E0.csv') as csvfile:
-	for boom in range(0, 1):
+	for monte_carlo_iteration in range(0, 100):
 
-		wages = { 'Man City': 2.08, 'Liverpool': 1.63, 'Chelsea': 2.31, 'Arsenal': 2.06, 'Everton': 0.80, 'Tottenham': 1.18, 'Man United': 2.17, 'Southampton': 0.64, 'Stoke': 0.77, 'Hull': 0.3, 'Burnley': 0.3, 'Swansea': 0.55, 'West Ham': 0.74, 'West Brom': 0.73, 'Middlesbrough': 0.3, 'Crystal Palace': 0.58, 'Leicester': 0.60, 'Sunderland': 0.76, 'Watford': 0.31, 'Bournemouth': 0.27}
-		dates = []
-		totalHomeGoalsNewSeason = []
-		totalAwayGoalsNewSeason = []
-		goalsDictNewSeason = defaultdict(list)
+		goals_for_one_season = defaultdict(list)
+		team_points = defaultdict(list)
 		
-
-		teamPoints = defaultdict(list)
-		combinedParameters = defaultdict(list)
-		flags = 0
-		flag = 0
-		draws = 0
-
-	
 		reader = csv.DictReader(csvfile)
 		csvfile.seek(0)
 		for row in reader:
-			total = 0
-			homeProb = 0
-			awayProb = 0
-			drawProb = 0
-			win = 0
-			if datetime.datetime.strptime(row['Date'], "%d/%m/%y") > datetime.datetime(2016, 6,1) and datetime.datetime.strptime(row['Date'], "%d/%m/%y") < datetime.datetime(2017, 6, 1):
-				homeTeam = row['HomeTeam']
-				awayTeam = row['AwayTeam']
-				home_attack_rating1, home_attack_rating2, home_attack_rating3, home_attack_rating4 = attack_grayson_rating(homeTeam, homeGoalsDict, homeGoalsConcDict, homeShotsDict, homeShotsFacedDict, homeShotsOnTargetDict, homeShotsOnTargetFacedDict, 19)
-				home_defence_rating1, home_defence_rating2, home_defence_rating3, home_defence_rating4 = defence_grayson_rating(homeTeam, homeGoalsDict, homeGoalsConcDict, homeShotsDict, homeShotsFacedDict, homeShotsOnTargetDict, homeShotsOnTargetFacedDict, 19)
-				away_attack_rating1, away_attack_rating2, away_attack_rating3, away_attack_rating4 = attack_grayson_rating(awayTeam, awayGoalsDict, awayGoalsConcDict, awayShotsDict, awayShotsFacedDict, awayShotsOnTargetDict, awayShotsOnTargetFacedDict, 19)
-				away_defence_rating1, away_defence_rating2, away_defence_rating3, away_defence_rating4 = defence_grayson_rating(awayTeam, awayGoalsDict, awayGoalsConcDict, awayShotsDict, awayShotsFacedDict, awayShotsOnTargetDict, awayShotsOnTargetFacedDict, 19)
-				x = 0.4182*home_attack_rating1 + 0.9073*home_attack_rating2 + 0.3586*home_attack_rating3 - 0.5467*home_attack_rating4 + 0.5019*away_defence_rating1 + 0.9585*away_defence_rating2 + 1.0234*away_defence_rating3 + 1.4081*away_defence_rating4 - 0.8
-				y = 0.4182*away_attack_rating1 + 0.9073*away_attack_rating2 + 0.3586*away_attack_rating3 - 0.5467*away_attack_rating4 + 0.5019*home_defence_rating1 + 0.9585*home_defence_rating2 + 1.0234*home_defence_rating3 + 1.4081*home_defence_rating4 - 0.8
-				extra = wages[homeTeam] - wages[awayTeam]
-				if x > 2 or y > 2:
-					chances +=1
-					print(homeTeam, awayTeam)
-				if homeTeam =='Chelsea' or homeTeam =='Arsenal' or homeTeam =='Man United' or homeTeam == 'Man City':
-					y = 0
-				#print(homeTeam,x,y,awayTeam)
-				probabilityMatrix = bivpois(6, 6, x, y, -0.2)
-				for i in range(0, 5):
-					for j in range(0, 5):
-						# print(str(probabilityMatrix[i][j]) + ', ', end=" ")
-						total += probabilityMatrix[i][j]
-						if i > j:
-							homeProb += probabilityMatrix[i][j]
-						if i < j:
-							awayProb += probabilityMatrix[i][j]
-						if i == j:
-							drawProb += probabilityMatrix[i][j]
-						# print("\n")
-				score = predictor(probabilityMatrix)
+			if datetime.datetime.strptime(row['Date'], "%d/%m/%y") > datetime.datetime(2016,6,1) and datetime.datetime.strptime(row['Date'], "%d/%m/%y") < datetime.datetime(2017, 6, 1):
+				home_team = row['HomeTeam']
+				away_team = row['AwayTeam']
+				home_attack_ratings = attack_rating(home_team, home_goals_scored, home_goals_conceded, home_total_shots, home_total_shots_faced, home_shots_on_target, home_shots_on_target_faced, 19)
+				home_defence_ratings = defence_rating(home_team, home_goals_scored, home_goals_conceded, home_total_shots, home_total_shots_faced, home_shots_on_target, home_shots_on_target_faced, 19)
+				away_attack_ratings = attack_rating(away_team, away_goals_scored, away_goals_conceded, away_total_shots, away_total_shots_faced, away_shots_on_target, away_shots_on_target_faced, 19)
+				away_defence_ratings = defence_rating(away_team, away_goals_scored, away_goals_conceded, away_total_shots, away_total_shots_faced, away_shots_on_target, away_shots_on_target_faced, 19)
+				'''x = regression(home_attack_ratings, away_defence_ratings)
+				y = regression(away_attack_ratings, home_defence_ratings)
+				x = x + 0.25 * wages[home_team]
+				y = y + 0.25 * wages[away_team]
+				extra = wages[home_team] - wages[away_team]
+				x = x + extra'''
+				x = (wages[home_team] - wages[away_team])*0.342879 + 1.527607
+				y = (wages[away_team] - wages[home_team])*0.342879 + 1.527607
+				'''if home_team == 'Chelsea':
+					print(home_team,x,y,away_team)'''
+				probability_matrix = bivpois(6, 6, x, y, -0.2)
+				home_prob, away_prob, draw_prob = probability_calculator(probability_matrix)
+				score = predictor(probability_matrix)
 				if score[0] > score[1]:
-					teamPoints[homeTeam].append(3)
+					team_points[home_team].append(3)
 				if score[0] < score[1]:
-					teamPoints[awayTeam].append(3)
+					team_points[away_team].append(3)
 				if score[0] == score[1]:
-					teamPoints[homeTeam].append(1)
-					teamPoints[awayTeam].append(1)
-				
-				
+					team_points[home_team].append(1)
+					team_points[away_team].append(1)
 
-				'''goalsDictNewSeason[homeTeam].append(float(score[0]))
-				goalsDictNewSeason[awayTeam].append(float(score[1]))
-				# print(x, probableHomeGoals)
-				# print(y, probableAwayGoals)
-				homeShotsOnTargetDict[homeTeam].append(float(row['HST']))
-				homeShotsOnTargetFacedDict[homeTeam].append(float(row['AST']))
-				homeGoalsDict[homeTeam].append(score[0])
-				homeGoalsConcDict[homeTeam].append(score[1])
-				homeShotsDict[homeTeam].append((float(row['HS'])))
-				homeShotsFacedDict[homeTeam].append((float(row['AS'])))
+				goals_for_one_season[home_team].append(float(score[0]))
+				goals_for_one_season[away_team].append(float(score[1]))
 
-				awayShotsOnTargetDict[awayTeam].append(float(row['AST']))
-				awayShotsOnTargetFacedDict[awayTeam].append(float(row['HST']))
-				awayGoalsDict[awayTeam].append(score[1])
-				awayGoalsConcDict[awayTeam].append(score[0])
-				awayShotsDict[awayTeam].append((float(row['AS'])))
-				awayShotsFacedDict[awayTeam].append((float(row['HS'])))'''
-				
+		for team in team_points:
+			total_team_points[team].append(sum(team_points[team]))
+			total_goals[team].append(sum(goals_for_one_season[team]))
+		print(monte_carlo_iteration)
 
-		for team in teamPoints:
-			totalTeamPoints[team].append(sum(teamPoints[team]))
-			totalGoalsDictNewSeason[team].append(sum(goalsDictNewSeason[team]))
-		#print(boom, maxi, sum(teamPoints[maxi]))
-		#time.sleep(2)
-		#print(len(homeGoalsConcDict['Chelsea']))
-		#print(flag)
-
-for team in totalTeamPoints:
-	averageTeamPoints[team] = average(totalTeamPoints[team])
-	goalsDictNewSeasonAv[team] = average(totalGoalsDictNewSeason[team])
+for team in total_team_points:
+	av_team_points[team] = average(total_team_points[team])
+	av_goals_scored[team] = average(total_goals[team])
 
 
 from operator import itemgetter
-
-sorted_data = sorted(averageTeamPoints.items(), key=operator.itemgetter(1), reverse=True)
-goalsDictNewSeasonAv_sorted = sorted(goalsDictNewSeasonAv.items(), key=operator.itemgetter(1), reverse=True)
+sorted_points = sorted(av_team_points.items(), key=operator.itemgetter(1), reverse=True)
+sorted_goals = sorted(av_goals_scored.items(), key=operator.itemgetter(1), reverse=True)
 
 for i in range(20):
-	print(sorted_data[i], goalsDictNewSeasonAv_sorted[i])
+	print(sorted_points[i], sorted_goals[i])
 
-total_average_points = 0
-total_average_points_previous_season = 0
 
-print(chances)
 
